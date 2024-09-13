@@ -66,10 +66,7 @@ def get_dblp_articles(author_name):
         for article in selector.css(".title")
     ]
 
-    if articles:
-        for i, article in enumerate(articles, 1):
-            print(f"{i}. {article}")
-    else:
+    if not articles:
         print("DBLP : No articles found or selector issue.")
 
     return articles

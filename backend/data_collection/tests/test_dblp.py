@@ -4,7 +4,7 @@ import data_collection.dblp
 from data_collection.dblp import get_dblp_articles, get_html_content
 
 
-class TestDblpArticles(unittest.TestCase):
+class TestDblpFunctions(unittest.TestCase):
 
     @patch('data_collection.dblp.requests.get')
     def test_get_html_content_success(self, mock_get):
