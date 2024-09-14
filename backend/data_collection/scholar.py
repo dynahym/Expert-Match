@@ -1,10 +1,10 @@
 import sys
+from typing import List, Tuple
 from scholarly import scholarly
 
 sys.stdout.reconfigure(encoding="utf-8")
 
-
-def get_scholar_articles_interests(name):
+def get_scholar_articles_interests(name: str) -> Tuple[List[str], List[str]]:
     """
     Searches for an author on Google Scholar and retrieves their research interests and publications.
 
@@ -12,7 +12,7 @@ def get_scholar_articles_interests(name):
         name (str): The name of the author to search for.
 
     Returns:
-        tuple: A tuple containing two lists:
+        Tuple[List[str], List[str]]: A tuple containing two lists:
             - A list of research interests (strings) of the author.
             - A list of publication titles (strings) by the author.
     """
@@ -33,6 +33,6 @@ def get_scholar_articles_interests(name):
         for publication in author_info["publications"]
     ]
 
-    interests = author_info["interests"]
+    interests = author_info.get("interests", [])
 
     return interests, publications

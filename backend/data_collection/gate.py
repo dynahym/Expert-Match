@@ -1,16 +1,17 @@
+from typing import List, Tuple
 from playwright.sync_api import sync_playwright
 from parsel import Selector
 import urllib.parse
 from .config import USER_AGENT
 
-def names_match(first_names, last_names, profile_names):
+def names_match(first_names: List[str], last_names: List[str], profile_names: List[str]) -> bool:
     """
     Checks if the profile names match the given first and last names.
 
     Args:
-        first_names (list of str): List of first names to match.
-        last_names (list of str): List of last names to match.
-        profile_names (list of str): List of names from the profile.
+        first_names (List[str]): List of first names to match.
+        last_names (List[str]): List of last names to match.
+        profile_names (List[str]): List of names from the profile.
 
     Returns:
         bool: True if the profile names match the first and last names, otherwise False.
@@ -19,8 +20,7 @@ def names_match(first_names, last_names, profile_names):
     ln_matches = all(ln in profile_names for ln in last_names)
     return fn_matches and ln_matches
 
-
-def get_gate_profile_url(first_name, last_name):
+def get_gate_profile_url(first_name: str, last_name: str) -> str:
     """
     Searches for a researcher on ResearchGate and retrieves the URL of their profile.
 
@@ -71,8 +71,7 @@ def get_gate_profile_url(first_name, last_name):
         finally:
             browser.close()
 
-
-def get_gate_articles_interests(profile_url):
+def get_gate_articles_interests(profile_url: str) -> Tuple[List[str], List[str]]:
     """
     Retrieves the research interests and publication titles from a ResearchGate profile.
 
@@ -80,7 +79,7 @@ def get_gate_articles_interests(profile_url):
         profile_url (str): The URL of the researcher's profile.
 
     Returns:
-        tuple: A tuple containing two lists:
+        Tuple[List[str], List[str]]: A tuple containing two lists:
             - A list of research interests (strings).
             - A list of publication titles (strings).
     """
@@ -115,6 +114,7 @@ def get_gate_articles_interests(profile_url):
         except Exception as e:
             # Print any errors that occur during the process
             print(f"GATE : An error occurred: {e}")
+            return [], []
 
         finally:
             browser.close()

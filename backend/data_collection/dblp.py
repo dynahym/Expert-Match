@@ -1,9 +1,9 @@
 import requests
 from parsel import Selector
+from typing import List
 from .config import API_URL, HEADERS
 
-
-def get_html_content(url):
+def get_html_content(url: str) -> str:
     """
     Fetches HTML content from a given URL.
 
@@ -21,8 +21,7 @@ def get_html_content(url):
         print(f"DBLP : Error fetching HTML content from {url}: {e}")
         return ""
 
-
-def get_dblp_articles(author_name):
+def get_dblp_articles(author_name: str) -> List[str]:
     """
     Searches for the most relevant author on DBLP and retrieves their publications.
 
@@ -30,7 +29,7 @@ def get_dblp_articles(author_name):
         author_name (str): The name of the author to search for.
 
     Returns:
-        list: A list of article titles (in lowercase) or an empty list if no articles are found.
+        List[str]: A list of article titles (in lowercase) or an empty list if no articles are found.
     """
     # Parameters for the API request
     params = {"q": author_name, "format": "json"}
@@ -50,7 +49,7 @@ def get_dblp_articles(author_name):
         print(f"DBLP : No results found for author: {author_name}")
         return []
 
-    # Find the most relevent author
+    # Find the most relevant author
     best_author = max(authors, key=lambda a: float(a.get("score", 0)))
     author_info = best_author.get("info", {})
     author_url = author_info.get("url")
@@ -61,6 +60,8 @@ def get_dblp_articles(author_name):
     # Fetch the HTML content of the author's DBLP page
     html_content = get_html_content(author_url)
     selector = Selector(text=html_content)
+    
+    # Extract article titles and return them in lowercase
     articles = [
         article.css("::text").get().strip().lower()
         for article in selector.css(".title")
