@@ -1,6 +1,5 @@
 from django.test import TestCase
-from unittest.mock import patch
-from .clean import normalize_text, is_similar, remove_duplicates, fetch_researcher_data
+from .clean import normalize_text, is_similar, remove_duplicates
 
 class TestCleanFunctions(TestCase):
     
