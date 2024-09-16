@@ -1,10 +1,9 @@
-import unittest, requests
+from django.test import TestCase
 from unittest.mock import patch, MagicMock
-import data_collection.dblp
+import requests
 from data_collection.dblp import get_dblp_articles, get_html_content
 
-
-class TestDblpFunctions(unittest.TestCase):
+class TestDblpFunctions(TestCase):
 
     @patch('data_collection.dblp.requests.get')
     def test_get_html_content_success(self, mock_get):
@@ -68,7 +67,7 @@ class TestDblpFunctions(unittest.TestCase):
 
         # Ensure the API call and HTML fetching were done
         mock_get.assert_called_once_with(
-            data_collection.dblp.API_URL, headers=data_collection.dblp.HEADERS, params={'q': author_name, 'format': 'json'}
+            'https://dblp.org/search/author/api', headers={'Accept': 'application/json'}, params={'q': author_name, 'format': 'json'}
         )
         mock_get_html_content.assert_called_once_with("https://dblp.org/test-author-url")
 
@@ -96,6 +95,3 @@ class TestDblpFunctions(unittest.TestCase):
 
         self.assertEqual(articles, [])
         mock_get.assert_called_once()
-
-if __name__ == '__main__':
-    unittest.main()

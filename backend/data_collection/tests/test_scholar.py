@@ -1,8 +1,8 @@
-import unittest
+from django.test import TestCase
 from unittest.mock import patch, MagicMock
 from data_collection.scholar import get_scholar_articles_interests
 
-class TestScholarFunctions(unittest.TestCase):
+class TestScholarFunctions(TestCase):
     
     @patch('data_collection.scholar.scholarly.search_author')
     @patch('data_collection.scholar.scholarly.fill')
@@ -28,6 +28,3 @@ class TestScholarFunctions(unittest.TestCase):
             interests, publications = get_scholar_articles_interests("Unknown Author")
             self.assertEqual(interests, [])
             self.assertEqual(publications, [])
-
-if __name__ == '__main__':
-    unittest.main()

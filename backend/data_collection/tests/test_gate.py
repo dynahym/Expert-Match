@@ -1,13 +1,13 @@
-import unittest
+from django.test import TestCase
 from unittest.mock import patch, MagicMock
 from data_collection.gate import names_match, get_gate_profile_url, get_gate_articles_interests
 
-class TestGateFunctions(unittest.TestCase):
+class TestGateFunctions(TestCase):
 
     def test_names_match(self):
         first_names = ["john"]
         last_names = ["doe"]
-        profile_names = ["john", "doe"] 
+        profile_names = ["john", "doe"]
         self.assertTrue(names_match(first_names, last_names, profile_names))
 
         profile_names = ["jane", "doe"]
@@ -18,7 +18,6 @@ class TestGateFunctions(unittest.TestCase):
 
         profile_names = ["doe", "john"]
         self.assertTrue(names_match(first_names, last_names, profile_names))
-
 
     @patch('data_collection.gate.sync_playwright')
     def test_get_gate_profile_url(self, mock_playwright):
@@ -54,6 +53,3 @@ class TestGateFunctions(unittest.TestCase):
         interests, articles = get_gate_articles_interests("https://www.researchgate.net/profile/1")
         self.assertEqual(interests, ["AI", "ML"])
         self.assertEqual(articles, ["publication one", "publication two"])
-
-if __name__ == '__main__':
-    unittest.main()
