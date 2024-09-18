@@ -1,44 +1,58 @@
-from typing import List, Tuple
-from data_collection.gate import get_gate_articles_interests, get_gate_profile_url
+from concurrent.futures import ThreadPoolExecutor
+from typing import List, Tuple, Dict
+from data_collection.gate import get_gate_articles_interests
 from data_collection.scholar import get_scholar_articles_interests
 from data_collection.dblp import get_dblp_articles
 from data_cleaning.clean import remove_duplicates
 from data_cleaning.translate import translate_texts
 
-
-def fetch_researcher_data(first_name: str, last_name: str) -> Tuple[List[str], List[str]]:
+def fetch_researcher_data(first_name: str, last_name: str) -> Tuple[List[Tuple[str, str]], List[Tuple[str, str]]]:
     """
-    Retrieve researcher data (articles, interests) from ResearchGate, DBLP, and Google Scholar.
+    Retrieve researcher data (articles, interests) from DBLP, Google Scholar, and ResearchGate in parallel.
 
     Args:
         first_name (str): The researcher's first name.
         last_name (str): The researcher's last name.
 
     Returns:
-        Tuple[List[str], List[str]]: A tuple containing two lists:
-            - A list of article titles (strings).
-            - A list of research interests (strings).
+        Tuple[List[Tuple[str, str]], List[Tuple[str, str]]]: A tuple containing two lists:
+            - A list of unique article titles (strings) with their sources.
+            - A list of unique research interests (strings) with their sources.
     """
-    articles, interests = [], []
+    dblp_articles, gs_articles, rg_articles = [], [], []
+    gs_interests, rg_interests = [], []
 
-    # DBLP
-    name = f"{first_name} {last_name}"
-    dblp_articles = get_dblp_articles(name)
-    articles.extend(remove_duplicates(translate_texts(dblp_articles))) if dblp_articles else None
+    with ThreadPoolExecutor() as executor:
+        # Submit tasks to fetch articles and interests from different sources
+        dblp_future = executor.submit(get_dblp_articles, f"{first_name} {last_name}")
+        gs_future = executor.submit(get_scholar_articles_interests, f"{first_name} {last_name}")
+        rg_future = executor.submit(get_gate_articles_interests, first_name, last_name)
 
-    # Google Scholar
-    gs_interests, gs_articles = get_scholar_articles_interests(name)
-    articles.extend(remove_duplicates(translate_texts(gs_articles))) if gs_articles else None
-    interests.extend(remove_duplicates(gs_interests)) if gs_interests else None
+        # Collect results
+        dblp_articles = dblp_future.result()
+        gs_interests, gs_articles = gs_future.result()
+        rg_interests, rg_articles = rg_future.result()
+
+    # Combine articles with their sources
+    all_articles = [(article, 'DBLP') for article in dblp_articles] \
+                 + [(article, 'Google Scholar') for article in gs_articles] \
+                 + [(article, 'ResearchGate') for article in rg_articles]
+    all_interests = [(interest, 'Google Scholar') for interest in gs_interests] \
+                 + [(interest, 'ResearchGate') for interest in rg_interests]
+
+    # Extract titles and translate
+    articles_titles = [article for article, _ in all_articles]
+    translated_titles = translate_texts(articles_titles)
     
-    # ResearchGate
-    profile_url = get_gate_profile_url(first_name, last_name)
-    if profile_url:
-        rg_interests, rg_articles = get_gate_articles_interests(profile_url)
-        articles.extend(remove_duplicates(translate_texts(rg_articles))) if rg_articles else None
-        interests.extend(remove_duplicates(rg_interests)) if rg_interests else None
+    # Create a mapping of translated titles to their original sources
+    title_to_source = {}
+    for (original_article, source), translated_article in zip(all_articles, translated_titles):
+        title_to_source[translated_article] = source
 
-    unique_articles = remove_duplicates(articles)
-    unique_interests = remove_duplicates(interests)
+    # Remove duplicates while preserving the source information
+    unique_translated_titles = remove_duplicates(translated_titles)
 
-    return unique_articles, unique_interests
+    # Prepare the final list of unique articles with their sources
+    unique_articles_with_sources = [(title, title_to_source[title]) for title in unique_translated_titles]
+
+    return unique_articles_with_sources, list(set(all_interests))

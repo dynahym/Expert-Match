@@ -20,16 +20,19 @@ def names_match(first_names: List[str], last_names: List[str], profile_names: Li
     ln_matches = all(ln in profile_names for ln in last_names)
     return fn_matches and ln_matches
 
-def get_gate_profile_url(first_name: str, last_name: str) -> str:
+def get_gate_articles_interests(first_name: str, last_name: str) -> Tuple[List[str], List[str]]:
     """
-    Searches for a researcher on ResearchGate and retrieves the URL of their profile.
+    Retrieves the research interests and publication titles from a ResearchGate profile
+    based on the researcher's first and last names.
 
     Args:
         first_name (str): The first name of the researcher.
         last_name (str): The last name of the researcher.
 
     Returns:
-        str: The URL of the researcher's profile, or an empty string if no profile is found.
+        Tuple[List[str], List[str]]: A tuple containing two lists:
+            - A list of research interests (strings).
+            - A list of publication titles (strings).
     """
     with sync_playwright() as p:
         browser = p.chromium.launch(headless=True)  # Launch a headless browser
@@ -61,33 +64,10 @@ def get_gate_profile_url(first_name: str, last_name: str) -> str:
 
             # Return the shortest URL from the results or an empty string if no results
             profile_url = min(result, key=len) if result else ""
-            return profile_url
-
-        except Exception as e:
-            # Print any errors that occur during the process
-            print(f"GATE : An error occurred: {e}")
-            return ""
-
-        finally:
-            browser.close()
-
-def get_gate_articles_interests(profile_url: str) -> Tuple[List[str], List[str]]:
-    """
-    Retrieves the research interests and publication titles from a ResearchGate profile.
-
-    Args:
-        profile_url (str): The URL of the researcher's profile.
-
-    Returns:
-        Tuple[List[str], List[str]]: A tuple containing two lists:
-            - A list of research interests (strings).
-            - A list of publication titles (strings).
-    """
-    with sync_playwright() as p:
-        browser = p.chromium.launch(headless=True)  # Launch a headless browser
-        page = browser.new_page(user_agent=USER_AGENT)  # Open a new page with a specified User-Agent
-
-        try:
+            
+            if not profile_url:
+                return [], []
+            
             page.goto(profile_url, wait_until="domcontentloaded")  # Navigate to the researcher's profile page
             selector = Selector(text=page.content())
 
