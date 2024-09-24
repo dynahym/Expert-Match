@@ -1,5 +1,6 @@
 from django.db import models
 import uuid
+from datetime import date
 
 class Pays(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
@@ -20,6 +21,11 @@ class Etablissement(models.Model):
 
 
 class Doctorant(models.Model):
+    DOCTORAT_CHOICES = [
+        ('LMD', 'LMD (5 years)'),
+        ('Classique', 'Classique (6 years)')
+    ]
+
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     nom = models.CharField(max_length=255)
     prenom = models.CharField(max_length=255)
@@ -32,11 +38,11 @@ class Doctorant(models.Model):
     etablissement_origine_magister = models.ForeignKey(Etablissement, on_delete=models.CASCADE, related_name='doctorants_magister', blank=True, null=True)
     etablissement_origine = models.ForeignKey(Etablissement, on_delete=models.CASCADE, related_name='doctorants_origine', blank=True, null=True)
     etablissement_exercice = models.ForeignKey(Etablissement, on_delete=models.CASCADE, related_name='doctorants_exercice', blank=True, null=True)
-    type_doctorat = models.CharField(max_length=255, blank=True, null=True)
+    type_doctorat = models.CharField(max_length=50, choices=DOCTORAT_CHOICES)
     premiere_inscription = models.DateField(blank=True, null=True)
     titre_these = models.TextField(blank=True, null=True)
     date_enregistrement_these = models.DateField(blank=True, null=True)
-    laboratoire = models.CharField(max_length=255, blank=True, null=True)
+    laboratoire = models.CharField(max_length=255, blank=True, null=True, choices=[('LCSI', 'LCSI'), ('LMCS', 'LMCS'), ('Externe', 'Externe')])
     directeur_these = models.ForeignKey('Expert', on_delete=models.CASCADE, related_name='doctorants_directeurs', blank=True, null=True)
     co_directeur_these = models.ForeignKey('Expert', on_delete=models.CASCADE, related_name='doctorants_co_directeurs', blank=True, null=True)
     situation = models.CharField(max_length=255, blank=True, null=True)
@@ -44,6 +50,18 @@ class Doctorant(models.Model):
 
     def __str__(self):
         return f"{self.nom} {self.prenom}"
+
+    @property
+    def nombre_reinscriptions(self):
+        """Calculate the number of re-inscriptions based on the PV entries."""
+        return self.pvs.filter(annee__gte=self.premiere_inscription.year).count()
+
+    @property
+    def retardataire(self):
+        """Determine if the student is delayed."""
+        duration = 5 if self.type_doctorat == 'LMD' else 6
+        years_spent = date.today().year - self.premiere_inscription.year
+        return self.nombre_reinscriptions > duration or years_spent > duration
 
 
 class Expert(models.Model):
@@ -83,14 +101,30 @@ class Publication(models.Model):
 
 
 class Evaluation(models.Model):
+    EVALUATION_DECISION_CHOICES = [
+        ('Favorable', 'Favorable'),
+        ('Favorable sous réserve', 'Favorable sous réserve'),
+        ('Défavorable', 'Défavorable')
+    ]
+
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     doctorant = models.ForeignKey(Doctorant, on_delete=models.CASCADE, related_name='evaluations')
-    expert = models.ForeignKey(Expert, on_delete=models.CASCADE, related_name='evaluations')
-    decision_attribution = models.TextField()
-    date_attribution = models.DateField()
+    expert_1 = models.ForeignKey(Expert, on_delete=models.CASCADE, related_name='evaluations_as_expert_1')
+    expert_2 = models.ForeignKey(Expert, on_delete=models.CASCADE, related_name='evaluations_as_expert_2')
+    type_evaluation = models.CharField(max_length=50, choices=[('Réinscription', 'Réinscription'), ('Soutenance', 'Soutenance')])
+    avis_expert_1 = models.CharField(max_length=50, choices=EVALUATION_DECISION_CHOICES)
+    avis_expert_2 = models.CharField(max_length=50, choices=EVALUATION_DECISION_CHOICES)
+    commentaire_expert_1 = models.TextField(blank=True, null=True)
+    commentaire_expert_2 = models.TextField(blank=True, null=True)
+    date_evaluation = models.DateField()
 
     def __str__(self):
-        return f"Evaluation {self.id} - {self.doctorant.nom} {self.doctorant.prenom} - {self.expert.nom} {self.expert.prenom}"
+        return f"Evaluation {self.id} - {self.doctorant.nom} {self.doctorant.prenom}"
+
+    @property
+    def defavorable(self):
+        """Check if either expert gave a 'Défavorable' decision."""
+        return self.avis_expert_1 == 'Défavorable' or self.avis_expert_2 == 'Défavorable'
 
 
 class MotCle(models.Model):
