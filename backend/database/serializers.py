@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Pays, Etablissement, Doctorant, Expert, PV, Publication, Evaluation, MotCle
+from .models import Pays, Etablissement, Doctorant, Expert, PV, Publication, Evaluation, MotCle, Expertise, Laboratoire
 
 class PaysSerializer(serializers.ModelSerializer):
     class Meta:
@@ -40,6 +40,13 @@ class MotCleSerializer(serializers.ModelSerializer):
     class Meta:
         model = MotCle
         fields = '__all__'
-
-class FilePathSerializer(serializers.Serializer):
-    file_path = serializers.CharField(required=True)
+        
+class ExpertiseSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Expertise
+        fields = '__all__'
+        
+class LaboratoireSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Laboratoire
+        fields = '__all__'
