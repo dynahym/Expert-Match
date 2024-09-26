@@ -60,5 +60,9 @@ def translate_texts(texts: List[str]) -> List[str]:
     Returns:
         List[str]: A list of translated or original texts, excluding unsupported languages.
     """
-    translated_texts = [translate_text(text) for text in texts if translate_text(text) != ""]
+    translated_texts = []
+    for text in texts:
+        translated_text = translate_text(text)
+        if translated_text:
+            translated_texts.append(translated_text)
     return translated_texts

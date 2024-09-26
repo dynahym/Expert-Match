@@ -65,55 +65,58 @@ def get_gate_profile_url(first_name: str, last_name: str) -> str:
 
         except Exception as e:
             # Print any errors that occur during the process
-            print(f"GATE : An error occurred: {e}")
+            print(f"GATE : An error occurred in get_gate_profile_url: {e}")
             return ""
 
         finally:
             browser.close()
 
-def get_gate_articles_interests(profile_url: str) -> Tuple[List[str], List[str]]:
+def get_gate_articles_interests(first_name: str, last_name: str) -> Tuple[List[str], List[str]]:
     """
-    Retrieves the research interests and publication titles from a ResearchGate profile.
+    Retrieves the research interests and publication titles from a ResearchGate profile
+    based on the researcher's first and last names.
 
     Args:
-        profile_url (str): The URL of the researcher's profile.
+        first_name (str): The first name of the researcher.
+        last_name (str): The last name of the researcher.
 
     Returns:
         Tuple[List[str], List[str]]: A tuple containing two lists:
             - A list of research interests (strings).
             - A list of publication titles (strings).
     """
-    with sync_playwright() as p:
-        browser = p.chromium.launch(headless=True)  # Launch a headless browser
-        page = browser.new_page(user_agent=USER_AGENT)  # Open a new page with a specified User-Agent
+    
+    # Get the profile URL using the get_gate_profile_url function
+    profile_url = get_gate_profile_url(first_name, last_name)
 
+    if not profile_url:
+        return [], []
+
+    with sync_playwright() as p:
         try:
+            browser = p.chromium.launch(headless=True)  # Launch a headless browser
+            page = browser.new_page(user_agent=USER_AGENT)  # Open a new page with a specified User-Agent
             page.goto(profile_url, wait_until="domcontentloaded")  # Navigate to the researcher's profile page
-            selector = Selector(text=page.content())
+            content = page.content()  # Get the page content
+            selector = Selector(text=content)
 
             # Extract research interests
             interest_elements = selector.css(".js-target-skills > .nova-legacy-l-flex__item")
-            interests = []
-            if interest_elements:
-                for interest in interest_elements:
-                    interests.append(interest.css("::text").get())
-            else:
-                print("GATE : No interests found or selector issue.")
+            interests = [interest.css("::text").get() for interest in interest_elements]
+            if not interests:
+                print(f"GATE : No interests found or selector issue.  \n{profile_url}")
 
             # Extract publication titles
             article_elements = selector.css(".nova-legacy-v-publication-item__title")
-            articles = []
-            if article_elements:
-                for article in article_elements:
-                    articles.append(article.css("::text").get().lower())
-            else:
-                print("GATE : No articles found or selector issue.")
+            articles = [article.css("::text").get().lower() for article in article_elements]
+            if not articles:
+                print(f"GATE : No articles found or selector issue.  \n{profile_url}")
 
             return interests, articles
 
         except Exception as e:
             # Print any errors that occur during the process
-            print(f"GATE : An error occurred: {e}")
+            print(f"GATE : An error occurred in get_gate_articles_interests: {e}")
             return [], []
 
         finally:
