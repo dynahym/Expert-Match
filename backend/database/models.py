@@ -135,14 +135,12 @@ class Doctorant(models.Model):
 
     @staticmethod
     def statistiques_par_sexe():
-        stats = Doctorant.objects.values("situation", "sexe").annotate(
-            total=models.Count("id")
-        )
+        stats = Doctorant.objects.filter(situation='Inscrit').values('sexe', 'premiere_inscription__year').annotate(total=models.Count('id'))
         return stats
 
     @staticmethod
     def statistiques_par_specialite():
-        stats = Doctorant.objects.values("situation", "specialite").annotate(
+        stats = Doctorant.objects.filter(situation='Inscrit').values('specialite', 'premiere_inscription__year').annotate(
             total=models.Count("id")
         )
         return stats

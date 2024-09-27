@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Statistiques des Doctorants">
+    <title>Statistiques des Doctorants</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+</head>
+<body>
+    <h1>Statistiques des Doctorants</h1>
+    
+    <h2>Statistiques par Situation</h2>
+    <h3>Inscrits</h3>
+    <img src="{% static images.inscrit %}" alt="Statistiques des Doctorants Inscrits">
+
+    <h3>Abandonnés</h3>
+    <img src="{% static images.abandon %}" alt="Statistiques des Doctorants Abandonnés">
+
+    <h3>Soutenus</h3>
+    <img src="{% static images.soutenu %}" alt="Statistiques des Doctorants Soutenus">
+</body>
+</html>

@@ -1,0 +1,52 @@
+/* Reset some default styles */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f4f4f4;
+    color: #333;
+    line-height: 1.6;
+    padding: 20px;
+}
+
+h1 {
+    text-align: center;
+    margin-bottom: 20px;
+    color: #4CAF50; /* Dark green color */
+}
+
+h2 {
+    margin-top: 20px;
+    color: #333;
+    border-bottom: 2px solid #4CAF50; /* Underline the header */
+    padding-bottom: 10px;
+}
+
+img {
+    display: block;
+    margin: 20px auto; /* Center align images */
+    max-width: 100%; /* Responsive image */
+    height: auto; /* Maintain aspect ratio */
+    border: 1px solid #ddd; /* Add border around images */
+    border-radius: 5px; /* Rounded corners */
+}
+
+.container {
+    max-width: 800px;
+    margin: 0 auto; /* Center the container */
+    padding: 20px;
+    background: #fff; /* White background for content */
+    border-radius: 8px; /* Rounded corners for container */
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+}
+
+footer {
+    text-align: center;
+    margin-top: 40px;
+    font-size: 0.9em;
+    color: #777;
+}
