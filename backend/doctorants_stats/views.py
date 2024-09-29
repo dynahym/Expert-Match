@@ -15,7 +15,8 @@ from .utils import (
     plot_stats_laboratoire,
     plot_stats_laboratoire_year,
     plot_stats_annee_etude,
-    plot_stats_annee_etude_year
+    plot_stats_annee_etude_year,
+    plot_stats_evaluation,
 )
 
 
@@ -29,7 +30,7 @@ def statistics_year_view(request):
 
         save_plot(filename_inscrit, plot_stats_year, stats, "Inscrit", "blue")
         save_plot(filename_abandon, plot_stats_year, stats, "Abandon", "red")
-        save_plot(filename_abandon, plot_stats_year, stats, "Soutenu", "green")
+        save_plot(filename_soutenu, plot_stats_year, stats, "Soutenu", "green")
 
         images = {
             "inscrit": "plots/stats_inscrit.png",
@@ -135,7 +136,6 @@ def statistics_specialite_year_view(request, year):
 def statistics_type_view(request):
     try:
         stats = list(Doctorant.statistiques_par_type())
-        print(stats)
         filename = "static/plots/stats_type.png"
 
         save_plot(filename, plot_stats_type, stats)
@@ -171,7 +171,6 @@ def statistics_type_year_view(request, year):
 def statistics_laboratoire_view(request):
     try:
         stats = list(Doctorant.statistiques_par_laboratoire())
-        
         filename = "static/plots/stats_laboratoire.png"
 
         save_plot(filename, plot_stats_laboratoire, stats)
@@ -184,6 +183,7 @@ def statistics_laboratoire_view(request):
         return HttpResponse(f"Erreur de valeur : {str(ve)}")
     except Exception as e:
         return HttpResponse(f"Erreur lors de la génération des statistiques : {str(e)}")
+
 
 def statistics_laboratoire_year_view(request, year):
     try:
@@ -201,11 +201,11 @@ def statistics_laboratoire_year_view(request, year):
         return HttpResponse(f"Erreur de valeur : {str(ve)}")
     except Exception as e:
         return HttpResponse(f"Erreur lors de la génération des statistiques : {str(e)}")
-    
+
+
 def statistics_annee_etude_view(request):
     try:
         stats = list(Doctorant.statistiques_par_annee_etude())
-        
         filename = "static/plots/stats_annee_etude.png"
 
         save_plot(filename, plot_stats_annee_etude, stats)
@@ -218,7 +218,8 @@ def statistics_annee_etude_view(request):
         return HttpResponse(f"Erreur de valeur : {str(ve)}")
     except Exception as e:
         return HttpResponse(f"Erreur lors de la génération des statistiques : {str(e)}")
-    
+
+
 def statistics_annee_etude_year_view(request, year):
     try:
         stats = list(Doctorant.statistiques_par_annee_etude())
@@ -235,4 +236,33 @@ def statistics_annee_etude_year_view(request, year):
         return HttpResponse(f"Erreur de valeur : {str(ve)}")
     except Exception as e:
         return HttpResponse(f"Erreur lors de la génération des statistiques : {str(e)}")
-    
+
+
+def retardataires_view(request):
+    try:
+        retardataires = Doctorant.obtenir_retardataires()
+        html = "statistics_retardataires.html"
+        return render(request, html, {"retardataires": retardataires})
+
+    except ValueError as ve:
+        return HttpResponse(f"Erreur de valeur : {str(ve)}")
+    except Exception as e:
+        return HttpResponse(f"Erreur lors de la génération des statistiques : {str(e)}")
+
+
+def statistics_evaluation_view(request, year):
+    try:
+        stats = Doctorant.statistiques_par_annee_et_statut_evaluation()
+        year = int(year)
+        filename = "static/plots/stats_evaluation.png"
+
+        save_plot(filename, plot_stats_evaluation, stats, year)
+
+        html = "statistics_evaluation.html"
+        image = "plots/stats_evaluation.png"
+        return render(request, html, {"image": image, "year": year})
+
+    except ValueError as ve:
+        return HttpResponse(f"Erreur de valeur : {str(ve)}")
+    except Exception as e:
+        return HttpResponse(f"Erreur lors de la génération des statistiques : {str(e)}")

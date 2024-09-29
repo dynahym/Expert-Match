@@ -349,3 +349,29 @@ def plot_stats_annee_etude_year(stats, year):
     plt.xticks(annees)
     plt.grid(axis="y")
     plt.gca().yaxis.set_major_locator(plt.MaxNLocator(integer=True))
+
+def plot_stats_evaluation(stats, year):
+    """
+    Plot the statistics of doctorant evaluations for a given year.
+
+    Parameters:
+        stats (list): List of dictionaries containing evaluation statistics (admitted, not admitted, year).
+        year (int): The year for which the stats are plotted.
+    """
+    stats_for_year = [
+        stat for stat in stats if stat["premiere_inscription__year"] == year
+    ]
+    
+    if stats_for_year:
+        stats_for_year = stats_for_year[0]
+        
+        labels = ['Admis', 'Non Admis']
+        totals = [stats_for_year['admis'], stats_for_year['non_admis']]
+
+        plt.bar(labels, totals)
+        plt.title(f"Évaluations pour l'année {year}")
+        plt.ylabel('Nombre de doctorants')
+        plt.xlabel('Statut')
+        plt.xticks(labels)
+        plt.grid(axis="y")
+        plt.gca().yaxis.set_major_locator(plt.MaxNLocator(integer=True))

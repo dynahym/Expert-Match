@@ -55,6 +55,8 @@ class Doctorant(models.Model):
     fonction = models.CharField(max_length=255, blank=True, null=True)
     emails = models.JSONField(default=list, blank=True, null=True)
     telephones = models.JSONField(default=list, blank=True, null=True)
+    
+    # ForeignKey fields for different institutions
     etablissement_origine_graduation = models.ForeignKey(
         "Etablissement",
         on_delete=models.CASCADE,
@@ -83,17 +85,20 @@ class Doctorant(models.Model):
         blank=True,
         null=True,
     )
+    
     type_doctorat = models.CharField(max_length=50, choices=DOCTORAT_CHOICES)
     premiere_inscription = models.DateField(blank=True, null=True)
     titre_these = models.TextField(blank=True, null=True)
     date_enregistrement_these = models.DateField(blank=True, null=True)
     specialite = models.CharField(max_length=100, blank=True, null=True)
+    
     laboratoires = models.ManyToManyField(
         "Laboratoire", related_name="doctorants", blank=True
     )
     situation = models.CharField(
         max_length=50, choices=SITUATION_CHOICES, default="Inscrit", blank=False
     )
+    
     directeur_these = models.ForeignKey(
         "Expert",
         on_delete=models.CASCADE,
@@ -122,10 +127,12 @@ class Doctorant(models.Model):
 
     @staticmethod
     def obtenir_retardataires():
+        """Récupérer les doctorants retardataires."""
         return [
             doctorant for doctorant in Doctorant.objects.all() if doctorant.retardataire
         ]
 
+    # Statistiques
     @staticmethod
     def statistiques_par_annee():
         stats = Doctorant.objects.values(
@@ -154,18 +161,15 @@ class Doctorant(models.Model):
 
     @staticmethod
     def statistiques_par_annee_et_statut_evaluation():
-        # Compter le nombre d'admis et non admis par année
-        stats = (
+        """Compter le nombre d'admis et non admis par an."""
+        return (
             Doctorant.objects.values("premiere_inscription__year")
             .annotate(
-                admis=Count("evaluations", filter=Q(evaluations__statut="admis")),
-                non_admis=Count(
-                    "evaluations", filter=Q(evaluations__statut="non admis")
-                ),
+                admis=Count("evaluations", filter=Q(evaluations__statut="Admis")),
+                non_admis=Count("evaluations", filter=Q(evaluations__statut="Non Admis")),
             )
-            .order_by("premiere_inscription__year")  # Tri par année
+            .order_by("premiere_inscription__year")
         )
-        return stats
 
     @staticmethod
     def statistiques_par_laboratoire():
@@ -176,6 +180,8 @@ class Doctorant(models.Model):
             .order_by("laboratoires__nom", "premiere_inscription__year")
         )
         return stats
+
+    @staticmethod
     def statistiques_par_annee_etude():
         return (
             Doctorant.objects.filter(situation='Inscrit').values("annee_etude", "premiere_inscription__year")
