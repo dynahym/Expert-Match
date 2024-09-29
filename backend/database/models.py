@@ -147,7 +147,7 @@ class Doctorant(models.Model):
 
     @staticmethod
     def statistiques_par_type():
-        stats = Doctorant.objects.values("situation", "type_doctorat").annotate(
+        stats = Doctorant.objects.filter(situation='Inscrit').values('type_doctorat', 'premiere_inscription__year').annotate(
             total=models.Count("id")
         )
         return stats
@@ -169,14 +169,16 @@ class Doctorant(models.Model):
 
     @staticmethod
     def statistiques_par_laboratoire():
-        stats = Doctorant.objects.values("situation", "laboratoires").annotate(
-            total=models.Count("id")
+        stats = (
+            Doctorant.objects.filter(situation="Inscrit")
+            .values("laboratoires__nom", "premiere_inscription__year")
+            .annotate(total=models.Count("id"))
+            .order_by("laboratoires__nom", "premiere_inscription__year")
         )
         return stats
-
     def statistiques_par_annee_etude():
         return (
-            Doctorant.objects.values("annee_etude", "situation")
+            Doctorant.objects.filter(situation='Inscrit').values("annee_etude", "premiere_inscription__year")
             .annotate(total=Count("id"))
             .order_by("annee_etude")
         )
