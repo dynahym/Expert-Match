@@ -42,7 +42,8 @@ INSTALLED_APPS = [
     'data_cleaning',
     'data_classification',
     'database',
-    'rest_framework'
+    'rest_framework',
+    'doctorants_stats'
 ]
 
 MIDDLEWARE = [
@@ -60,7 +61,6 @@ ROOT_URLCONF = 'backend.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -126,7 +126,7 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/5.0/howto/static-files/
 # settings.py
 
-STATIC_URL = '/static/'  # URL to access static files
+STATIC_URL = 'static/'
 STATICFILES_DIRS = [
     os.path.join(BASE_DIR, 'static'),  # Include the root static directory if you placed CSS here
 ]

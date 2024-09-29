@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="Liste des doctorants retardataires" />
+    <title>Liste des Retardataires</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'css/styles.css' %}" />
+</head>
+<body>
+    <h1>Liste des Retardataires</h1>
+    <div class="container"> <!-- Added container class -->
+        {% if retardataires %}
+        <table>
+            <thead>
+                <tr>
+                    <th scope="col">Nom</th>
+                    <th scope="col">Prénom</th>
+                    <th scope="col">Date de Naissance</th>
+                    <th scope="col">Type de Doctorat</th>
+                    <th scope="col">Année d'Étude</th>
+                    <th scope="col">Situation</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for doctorant in retardataires %}
+                <tr>
+                    <td>{{ doctorant.nom }}</td>
+                    <td>{{ doctorant.prenom }}</td>
+                    <td>{{ doctorant.date_naissance }}</td>
+                    <td>{{ doctorant.type_doctorat }}</td>
+                    <td>{{ doctorant.annee_etude }}</td>
+                    <td>{{ doctorant.situation }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <p>Aucun retardataire trouvé.</p>
+        {% endif %}
+    </div> <!-- End of container -->
+</body>
+</html>
