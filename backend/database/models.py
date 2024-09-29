@@ -129,7 +129,7 @@ class Doctorant(models.Model):
     def obtenir_retardataires():
         """Récupérer les doctorants retardataires."""
         return [
-            doctorant for doctorant in Doctorant.objects.all() if doctorant.retardataire
+            doctorant for doctorant in Doctorant.objects.filter(situation='Inscrit') if doctorant.retardataire
         ]
 
     # Statistiques

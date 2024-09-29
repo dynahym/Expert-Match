@@ -146,8 +146,9 @@ def plot_stats_specialite(stats):
             )
         for specialite in specialites
     ]
+    colors = ["blue", "orange", "green"]
 
-    plt.bar(specialites, totals)
+    plt.bar(specialites, totals, color=colors)
     plt.xlabel("Spécialité")
     plt.ylabel("Nombre de Doctorants Inscrits")
     plt.title("Statistiques par Spécialité (Inscrits seulement)")
@@ -202,7 +203,7 @@ def plot_stats_type(stats):
         )
         for type_doctorat in types
     ]
-    colors = ["purple", "yellow"]
+    colors = ["purple", "green"]
 
     plt.bar(types, totals, color=colors)
     plt.xlabel("Type de Doctorat")
@@ -233,7 +234,7 @@ def plot_stats_type_year(stats, year):
         )
         for type_doctorat in types
     ]
-    colors = ["purple", "yellow"]
+    colors = ["purple", "green"]
 
     plt.bar(types, totals, color=colors)
     plt.xlabel("Type de Doctorat")
@@ -259,7 +260,7 @@ def plot_stats_laboratoire(stats):
     sorted_labs = sorted(lab_totals.items(), key=lambda x: x[0], reverse=True)
     names, totals = zip(*sorted_labs)
 
-    plt.bar(names, totals, color="red")
+    plt.bar(names, totals)
     plt.xlabel("Laboratoire")
     plt.ylabel("Nombre de Doctorants Inscrits")
     plt.title("Statistiques par Laboratoire (Inscrits seulement)")
@@ -289,7 +290,7 @@ def plot_stats_laboratoire_year(stats, year):
     sorted_labs = sorted(lab_totals.items(), key=lambda x: x[0], reverse=True)
     names, totals = zip(*sorted_labs)
 
-    plt.bar(names, totals, color="red")
+    plt.bar(names, totals)
     plt.xlabel("Laboratoire")
     plt.ylabel("Nombre de Doctorants Inscrits")
     plt.title(f"Statistiques par Laboratoire pour l'année {year}")
