@@ -1,22 +1,22 @@
-# Platform for Automatic Expert Recommendations for PhD Thesis Review
+# Platform for Automated Recommendations of Experts for PhD Thesis Review
 
 ## Overview
 
-This project is designed to build a platform that automatically recommends experts for PhD thesis evaluations based on keyword matching between doctoral candidates' research interests and expert profiles. The platform aims to streamline the process of finding suitable reviewers by leveraging machine learning techniques.
+This project aims to develop a platform that automatically recommends experts for PhD thesis evaluations by matching keywords between doctoral candidates' research interests and expert profiles. The platform seeks to streamline the reviewer selection process through the application of machine learning techniques.
 
 ## Features
 
-- **Expert Database:** A comprehensive database of experts, categorized into:
-  - **Algerian Experts:** Internal to the university and external.
-  - **International Experts:** With whom collaborations have occurred.
+- **Expert Database:** A comprehensive collection of experts categorized into:
+  - **Algerian Experts:** Both internal and external to the university.
+  - **International Experts:** Those with whom collaborations have been established.
 
-- **Focus Areas:** Primarily in **Computer Science** and **Applied Mathematics**.
+- **Focus Areas:** Primarily focused on **Computer Science** and **Applied Mathematics**.
 
-- **Recommendation System:** Incorporates machine learning techniques to enhance expert recommendations:
-  - **Decision Trees** for expert assignment.
-  - **Clustering** to group similar expert profiles.
+- **Recommendation System:** Utilizes machine learning methods to optimize expert recommendations, including:
+  - **Decision Trees** for expert assignments.
+  - **Clustering** techniques to group similar expert profiles.
 
-- **Data Sources:** Enrichment of expert profiles using platforms like Google Scholar and ResearchGate.
+- **Data Sources:** Enriches expert profiles using platforms like Google Scholar and ResearchGate.
 
 ## Installation
 
@@ -29,7 +29,7 @@ cd expert_match_backend
 
 ### Dependencies
 
-Install the required dependencies:
+Install the required dependencies with:
 
 ```bash
 pip install -r requirements.txt
@@ -38,11 +38,15 @@ pip install -r requirements.txt
 ## Usage
 
 1. **Setup Database:** Configure the expert database with the necessary data.
-2. **Run the Recommendation System:** Execute the recommendation algorithm to generate expert suggestions based on research interests.
+2. **Démarrer le serveur Django** :
+   Exécutez la commande suivante :
+   ```bash
+   python manage.py runserver
+   ```
 
-```bash
-python main.py
-```
+## Documentation
+
+For detailed documentation on the Django project, refer to [Documentation](docs).
 
 ## Contact
 
