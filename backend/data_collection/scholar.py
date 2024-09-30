@@ -29,10 +29,14 @@ def get_scholar_articles_interests(name: str) -> Tuple[List[str], List[str]]:
     author_info = scholarly.fill(author)
 
     publications = [
-        publication["bib"]["title"].lower()
+        publication["bib"]["title"].strip().lower()
         for publication in author_info["publications"]
     ]
+    
+    interests = [
+        interest.strip().lower() 
+        for interest in author_info["interests"]
+    ]
 
-    interests = author_info.get("interests", [])
 
     return interests, publications

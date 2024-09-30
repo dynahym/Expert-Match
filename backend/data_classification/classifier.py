@@ -1,76 +1,99 @@
-from transformers import pipeline, AutoTokenizer
-from itertools import islice
-from typing import List, Tuple, Dict
-from .config import CANDIDATE_LABELS, SUBCATEGORY_LABELS
+import google.generativeai as genai
+import os, re
+from dotenv import load_dotenv
+from typing import List, Tuple
 
-model_name = 'facebook/bart-large-mnli'
-tokenizer = AutoTokenizer.from_pretrained(model_name, clean_up_tokenization_spaces=True)
-classifier = pipeline('zero-shot-classification', model=model_name, tokenizer=tokenizer)
+# Load environment variables from .env file
+load_dotenv()
 
-def classify_text(text: str) -> Tuple[str, List[str]]:
+api_key = os.getenv("API_KEY")
+if not api_key:
+    raise ValueError("API key must be set in the environment variable API_KEY.")
+
+# Configure the Google Generative AI client with the API key
+genai.configure(api_key=api_key)
+
+def clean_area(area: str) -> str:
     """
-    Classify the text into broad and subcategories and return the labels.
+    Cleans the specific area string by converting to lower case and removing parentheses.
 
     Args:
-        text (str): The text of the text to classify.
+    - area (str): The specific area to clean.
 
     Returns:
-        Tuple[str, List[str]]: A tuple containing the broad category label and a list of subcategory labels.
+    - str: The cleaned specific area.
     """
-    broad_result = classifier(text, CANDIDATE_LABELS)
-    broad_scores = broad_result['scores']
-    broad_labels = broad_result['labels']
-    
-    # Identify the broad category with the highest score
-    broad_category = broad_labels[broad_scores.index(max(broad_scores))]
+    # Use regex to remove text within parentheses and trim surrounding spaces
+    cleaned_area = re.sub(r'\s*\(.*?\)\s*', ' ', area).strip()
+    return cleaned_area.lower()
 
-    # If the broad category has associated subcategories, classify and return them
-    subcategories = []
-    if broad_category in SUBCATEGORY_LABELS:
-        subcategory_result = classifier(text, SUBCATEGORY_LABELS[broad_category])
-        subcategories = subcategory_result['labels']
-    
-    return broad_category, subcategories
 
-def classify_texts(texts: List[str], top_s: int = 10, top_t: int = 10, batch_size: int = 8) -> List[str]:
+def classify_article(article_text):
     """
-    Process each text to classify it and return only the top subcategory labels.
+    Classifies an article into specific academic domains and returns a list of specific areas.
 
     Args:
-        texts (List[str]): A list of texts to process.
-        top_s (int): The number of top subcategories to consider per text.
-        top_t (int): The number of top labels to return based on total occurrences.
-        batch_size (int): The number of texts to classify in each batch.
+    - article_text (str): The text of the article to classify.
 
     Returns:
-        List[str]: A list of the most frequent subcategory labels.
+    - list: A list of specific areas related to the article.
     """
-    totals: Dict[str, int] = {}
+    # Create a prompt focused on specific areas
+    prompt = (
+        "You are an expert in classifying articles into academic domains. "
+        "Classify the following article into academic domains and provide a **numbered list of specific areas only** without additional context: "
+        f"{article_text}"
+    )
 
-    # Process texts in batches
-    for start in range(0, len(texts), batch_size):
-        batch = texts[start:start + batch_size]
-        
-        # Classify the batch of texts
-        results = classifier(batch, CANDIDATE_LABELS)
-        
-        # Process each text's classification results
-        for i, text in enumerate(batch):
-            broad_result = results[i]
-            broad_scores = broad_result['scores']
-            broad_labels = broad_result['labels']
-            
-            broad_category = broad_labels[broad_scores.index(max(broad_scores))]
+    # Use the model to generate a classification response
+    model = genai.GenerativeModel("gemini-1.5-flash")
+    response = model.generate_content(prompt)
 
-            subcategory_labels = []
-            if broad_category in SUBCATEGORY_LABELS:
-                subcategory_result = classifier(text, SUBCATEGORY_LABELS[broad_category])
-                subcategory_labels = subcategory_result['labels']
-            
-            # Update counts for subcategory labels
-            for label in islice(subcategory_labels, top_s):
-                totals[label] = totals.get(label, 0) + 1
+    # Clean the response
+    specific_areas_text = response.text.strip()
+
+    # Use regex to extract the list items into a Python list
+    specific_areas_list = re.findall(r'\d+\.\s+\*\*(.*?)\*\*', specific_areas_text)
     
-    # Sort by frequency and return top_t labels
-    sorted_totals = sorted(totals.items(), key=lambda item: item[1], reverse=True)
-    return [label for label, _ in sorted_totals[:top_t]]
+    # Clean and extend the interests list with cleaned areas
+    interests = []
+    for area in specific_areas_list:
+        area_list = area.split(', ')
+        interests.extend(clean_area(area) for area in area_list)
+
+    return interests
+
+def classify_articles(articles: List[str]) -> List[Tuple[str, str]]:
+    """
+    Classifies multiple articles and returns a list of areas related to each article.
+
+    Args:
+    - articles (list): A list of article texts to classify.
+
+    Returns:
+    - list: A list of tuples where each tuple contains an area and its classification source.
+    """
+    # Create a prompt focused on specific areas for all articles
+    prompt = (
+        "You are an expert in classifying articles into academic domains. "
+        "Classify the following articles into academic domains and provide a **numbered list of specific areas only** without additional context:\n\n"
+    )
+    
+    for index, article in enumerate(articles, start=1):
+        prompt += f"{index}. {article}\n"
+
+    # Use the model to generate a classification response
+    model = genai.GenerativeModel("gemini-1.5-flash")
+    response = model.generate_content(prompt)
+
+    # Clean the response
+    specific_areas_text = response.text.strip().lower()
+    # Use regex to extract the list items into a Python list
+    specific_areas_list = re.findall(r'\d+\.\s+\*\*(.*?)\*\*', specific_areas_text)
+    
+    # Clean and extend the interests list with cleaned areas
+    interests = []
+    for area in specific_areas_list:
+        area_list = area.split(', ')
+        interests.extend(clean_area(area) for area in area_list)
+    return interests

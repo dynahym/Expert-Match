@@ -1,7 +1,7 @@
 import pandas as pd
 from django.core.management.base import BaseCommand
 from database.models import Pays, Etablissement, Expert, Publication, MotCle
-from backend.fetch import fetch_researcher_data
+from data_classification.fetch import fetch_researcher_data
 
 class Command(BaseCommand):
     help = 'Import experts from an Excel file.'
