@@ -46,7 +46,7 @@ pip install -r requirements.txt
 
 ## Documentation
 
-For detailed documentation on the Django project, refer to [Documentation](docs).
+For detailed documentation on the Django project, refer to [Documentation](backend/docs).
 
 ## Contact
 
