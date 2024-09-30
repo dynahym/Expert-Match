@@ -15,12 +15,12 @@ class TestScholarFunctions(TestCase):
                 {"bib": {"title": "First Publication"}},
                 {"bib": {"title": "Second Publication"}},
             ],
-            "interests": ["Machine Learning", "Artificial Intelligence"]
+            "interests": ["machine learning", "artificial intelligence"]
         }
         
         interests, publications = get_scholar_articles_interests("Test Author")
         
-        self.assertEqual(interests, ["Machine Learning", "Artificial Intelligence"])
+        self.assertEqual(interests, ["machine learning", "artificial intelligence"])
         self.assertEqual(publications, ["first publication", "second publication"])
 
     def test_get_scholar_articles_no_results(self):
