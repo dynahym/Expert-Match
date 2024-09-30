@@ -1,6 +1,5 @@
 from django.db import models
 import uuid
-from datetime import date
 from django.db.models import Count, Q
 
 
@@ -279,7 +278,7 @@ class MotCle(models.Model):
         choices=[
             ("Google Scholar", "Google Scholar"),
             ("ResearchGate", "ResearchGate"),
-            ("DBLP", "DBLP"),
+            ("Classified", "Classified"),
             ("Autre", "Autre"),
         ],
     )

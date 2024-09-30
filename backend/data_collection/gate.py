@@ -102,13 +102,13 @@ def get_gate_articles_interests(first_name: str, last_name: str) -> Tuple[List[s
 
             # Extract research interests
             interest_elements = selector.css(".js-target-skills > .nova-legacy-l-flex__item")
-            interests = [interest.css("::text").get() for interest in interest_elements]
+            interests = [interest.css("::text").get().strip().lower() for interest in interest_elements]
             if not interests:
                 print(f"GATE : No interests found or selector issue.  \n{profile_url}")
 
             # Extract publication titles
             article_elements = selector.css(".nova-legacy-v-publication-item__title")
-            articles = [article.css("::text").get().lower() for article in article_elements]
+            articles = [article.css("::text").get().strip().lower() for article in article_elements]
             if not articles:
                 print(f"GATE : No articles found or selector issue.  \n{profile_url}")
 
