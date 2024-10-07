@@ -70,7 +70,7 @@ class Command(BaseCommand):
                 'etablissement': etablissement,
                 'emails': row.get('emails', '').split(';') if pd.notna(row.get('emails', '')) else [],
                 'telephones': row.get('telephones', '').split(';') if pd.notna(row.get('telephones', '')) else [],
-                'nombre_evaluations': 0,
+                'nombre_expertises': 0,
                 'nombre_publications': len(publications),
                 'grade': row.get('grade', '').strip(),
             }

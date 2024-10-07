@@ -1,6 +1,5 @@
-import os
 from django.test import TestCase
-from .classifier import clean_area, classify_article, classify_articles
+from .classify import clean_area, classify_article, classify_articles
 
 class ClassifierTests(TestCase):
     
