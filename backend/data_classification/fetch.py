@@ -5,7 +5,7 @@ from data_collection.scholar import get_scholar_articles_interests
 from data_collection.dblp import get_dblp_articles
 from data_cleaning.clean import remove_duplicates
 from data_cleaning.translate import translate_texts
-from data_classification.classifier import classify_articles
+from data_classification.classify import classify_articles
 
 def fetch_researcher_data(first_name: str, last_name: str) -> Tuple[List[Tuple[str, str]], List[Tuple[str, str]]]:
     """
@@ -53,7 +53,9 @@ def fetch_researcher_data(first_name: str, last_name: str) -> Tuple[List[Tuple[s
     cls_interests = classify_articles(unique_articles)
     all_interests = gs_interests + rg_interests + cls_interests
     unique_interests = list(set(all_interests))
-    unique_interests.sort()  # Sort interests alphabetically
+
+    # Sort interests alphabetically based on the interest string
+    unique_interests.sort()  # Sort by the first element of the tuple (interest string)
     
     interests = []
     for interest in unique_interests:
@@ -66,3 +68,29 @@ def fetch_researcher_data(first_name: str, last_name: str) -> Tuple[List[Tuple[s
         interests.append((interest.title(), interest_source))
     
     return articles, interests
+
+
+# Example usage
+# first_name = "John"
+# last_name = "Doe"
+# # Print the name
+# print("Name:", first_name, last_name)
+
+# # Fetch researcher data
+# articles, interests = fetch_researcher_data(first_name, last_name)
+
+# # Sort articles by source
+# articles.sort(key=lambda x: x[1])  # Sort by the source (second element of the tuple)
+
+# # Print the retrieved articles
+# print("\nArticles:")
+# for title, source in articles:
+#     print(f"- {title} (Source: {source})")
+
+# # Sort interests by source
+# interests.sort(key=lambda x: x[1])  # Sort by the source (second element of the tuple)
+
+# # Print the retrieved interests
+# print("\nResearch Interests:")
+# for interest, source in interests:
+#     print(f"- {interest} (Source: {source})")

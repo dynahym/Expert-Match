@@ -28,7 +28,7 @@ def clean_area(area: str) -> str:
     return cleaned_area.lower()
 
 
-def classify_article(article_text):
+def classify_article(article_text: str) -> List[str]:
     """
     Classifies an article into specific academic domains and returns a list of specific areas.
 
@@ -63,7 +63,7 @@ def classify_article(article_text):
 
     return interests
 
-def classify_articles(articles: List[str]) -> List[Tuple[str, str]]:
+def classify_articles(articles: List[str]) -> List[str]:
     """
     Classifies multiple articles and returns a list of areas related to each article.
 
@@ -71,7 +71,7 @@ def classify_articles(articles: List[str]) -> List[Tuple[str, str]]:
     - articles (list): A list of article texts to classify.
 
     Returns:
-    - list: A list of tuples where each tuple contains an area and its classification source.
+    - list: A list of specific areas related to the article.
     """
     # Create a prompt focused on specific areas for all articles
     prompt = (
@@ -97,3 +97,27 @@ def classify_articles(articles: List[str]) -> List[Tuple[str, str]]:
         area_list = area.split(', ')
         interests.extend(clean_area(area) for area in area_list)
     return interests
+
+# Example usage
+# article_text = (
+#     "Various architectures and their applications in sentiment analysis."
+# )
+
+# # Classify a single article
+# classified_areas = classify_article(article_text)
+# print("Classified Areas for the Single Article:")
+# for area in classified_areas:
+#     print(f"- {area.title()}")
+
+# # Example list of article texts
+# articles = [
+#     "Machine learning algorithms in biomedical applications.",
+#     "The role of big data in modern healthcare.",
+#     "Advancements in artificial intelligence for image recognition."
+# ]
+
+# # Classify multiple articles
+# classified_areas_multiple = classify_articles(articles)
+# print("\nClassified Areas for Multiple Articles:")
+# for area in classified_areas_multiple:
+#     print(f"- {area.title()}")

@@ -201,6 +201,9 @@ class Expert(models.Model):
         blank=True,
         null=True,
     )
+    mots_cles = models.ManyToManyField(
+        "MotCle", related_name="experts_mots_cles", blank=True
+    )
     emails = models.JSONField(default=list, blank=True, null=True)
     telephones = models.JSONField(default=list, blank=True, null=True)
     nombre_expertises = models.IntegerField(default=0)
