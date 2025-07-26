@@ -23,8 +23,8 @@ This project aims to develop a platform that automatically recommends experts fo
 To get started with this project, clone the repository and follow the installation instructions:
 
 ```bash
-git clone https://github.com/dynahym/expert_match_backend.git
-cd expert_match_backend
+git clone https://github.com/dynahym/Expert-Match.git
+cd Expert-Match
 ```
 
 ### Dependencies
