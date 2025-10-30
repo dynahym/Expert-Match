@@ -27,14 +27,6 @@ git clone https://github.com/dynahym/Expert-Match.git
 cd Expert-Match
 ```
 
-### Dependencies
-
-Install the required dependencies with:
-
-```bash
-pip install -r requirements.txt
-```
-
 ## Usage
 
 1. **Setup Database:** Configure the expert database with the necessary data.
